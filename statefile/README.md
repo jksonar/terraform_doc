@@ -361,3 +361,18 @@ consul acl bootstrap
 - **Document** your bootstrap token and store it securely for future recovery.
 
 Let me know if you need help with any of the steps!
+
+---
+
+### command will generate token
+consul acl bootstrap
+AccessorID:       47aa5189-58c8-5e52-c14b-08f523f3ccb3
+SecretID:         7e7befe3-4281-bebd-1466-7b9780f7f5e5
+Description:      Bootstrap Token (Global Management)
+Local:            false
+Create Time:      2025-01-07 12:59:18.594167285 +0530 IST
+Policies:
+   00000000-0000-0000-0000-000000000001 - global-management
+
+### user the SecretID token to create environment variable
+export CONSUL_HTTP_TOKEN=7e7befe3-4281-bebd-1466-7b9780f7f5e5
