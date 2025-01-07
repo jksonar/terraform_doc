@@ -148,6 +148,99 @@ consul kv get terraform/state
 - **Enable TLS**: Always encrypt traffic between Terraform and Consul.  
 - **Audit Logs**: Enable logging for Consul to monitor state access.  
 - **Backup Consul**: Regularly backup the Consul data directory.
+<<<<<<< HEAD
+=======
+---
+To back up and restore Terraform state files from a Consul server, you can use the Consul KV CLI or API to export and import the state data.
+
+---
+
+### **1. Backup Terraform State from Consul**  
+Terraform state files are stored as key-value pairs in Consul. To back them up:
+
+**Option 1: Use Consul CLI**  
+```bash
+consul kv get terraform/state > terraform-backup.tfstate
+```
+- This exports the state from Consul to a local file.  
+- Replace `terraform/state` with the exact path you configured in the Terraform backend.
+
+**Option 2: Use Consul API**  
+```bash
+curl --header "X-Consul-Token: <YOUR_CONSUL_TOKEN>" http://127.0.0.1:8500/v1/kv/terraform/state | jq -r '.[0].Value' | base64 --decode > terraform-backup.tfstate
+```
+- This command fetches the KV entry via API, decodes the Base64 value, and saves it to a `.tfstate` file.  
+- Ensure you replace `<YOUR_CONSUL_TOKEN>` with your Consul ACL token.
+
+---
+
+### **2. Restore Terraform State to Consul**  
+
+**Option 1: Use Consul CLI**  
+```bash
+consul kv put terraform/state @terraform-backup.tfstate
+```
+- This uploads the state file back to Consul under the same path.  
+- Use the `@` symbol to upload the file contents.
+
+**Option 2: Use Consul API**  
+```bash
+curl --request PUT --header "X-Consul-Token: <YOUR_CONSUL_TOKEN>" \
+--data-binary @terraform-backup.tfstate \
+http://127.0.0.1:8500/v1/kv/terraform/state
+```
+- This uploads the backup state file directly to Consul.  
+
+---
+
+### **3. Automating Backup and Restore with Scripts**  
+
+**Backup Script** (`backup.sh`)  
+```bash
+#!/bin/bash
+CONSUL_TOKEN="<YOUR_CONSUL_TOKEN>"
+CONSUL_ADDR="http://127.0.0.1:8500"
+STATE_PATH="terraform/state"
+BACKUP_FILE="terraform-backup-$(date +%F-%H-%M).tfstate"
+
+consul kv get $STATE_PATH > $BACKUP_FILE
+echo "Backup saved to $BACKUP_FILE"
+```
+
+**Restore Script** (`restore.sh`)  
+```bash
+#!/bin/bash
+CONSUL_TOKEN="<YOUR_CONSUL_TOKEN>"
+CONSUL_ADDR="http://127.0.0.1:8500"
+STATE_PATH="terraform/state"
+BACKUP_FILE="terraform-backup.tfstate"
+
+consul kv put $STATE_PATH @$BACKUP_FILE
+echo "State restored from $BACKUP_FILE"
+```
+- Set these scripts to run on a cron job for automated backups.
+
+---
+
+### **4. Verify the State in Consul**  
+After restoring the state:  
+```bash
+consul kv get terraform/state
+```
+- Or use the API to verify:  
+```bash
+curl --header "X-Consul-Token: <YOUR_CONSUL_TOKEN>" \
+http://127.0.0.1:8500/v1/kv/terraform/state
+```
+
+---
+
+### **5. Best Practices**  
+- **Regular Backups**: Automate state backups daily or after critical deployments.  
+- **Encrypt State**: Use Consul’s encryption feature for KV storage.  
+- **Versioning**: Save backups with timestamps to retain multiple versions.  
+- **Locking**: Implement state locking in Terraform to avoid concurrent modifications.
+>>>>>>> dev
 
 The error you're seeing indicates that the anonymous token does not have the necessary `acl:write` permission to create a new ACL policy in Consul. This typically happens because ACLs are enabled, but the anonymous user lacks sufficient privileges.
 
