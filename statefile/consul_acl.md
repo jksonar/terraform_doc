@@ -1,4 +1,5 @@
-To create a Consul token for Terraform's backend that does not expire, you need to generate a token with an appropriate policy and set the TTL (Time-to-Live) to `0`, which indicates no expiration.
+To create a Consul token for Terraform's backend that does not expire, you need to generate a token with an appropriate policy and set the TTL (Time-to-Live) to `0`, 
+which indicates no expiration.
 
 Here’s how you can do it:
 
@@ -192,7 +193,8 @@ You can restrict the `web-ui-policy` to specific namespaces, datacenters, or pat
 
 ---
 
-The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster. It generates a special **bootstrap token** with full administrative privileges, allowing you to manage ACLs and configure the system after enabling ACLs.
+The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster. 
+It generates a special **bootstrap token** with full administrative privileges, allowing you to manage ACLs and configure the system after enabling ACLs.
 
 ---
 
@@ -629,7 +631,8 @@ If Consul was started with a custom configuration directory, the path may differ
 ---
 
 ### **Combining Multiple Config Files**
-If you have multiple `.hcl` or `.json` configuration files in the configuration directory, Consul automatically merges them. You can place `config.hcl` alongside other configuration files in the directory.
+If you have multiple `.hcl` or `.json` configuration files in the configuration directory, Consul automatically merges them. 
+You can place `config.hcl` alongside other configuration files in the directory.
 
 ---
 
@@ -648,7 +651,8 @@ consul info | grep ConfigDir
 
 ---
 
-The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster. It generates a special **bootstrap token** with full administrative privileges, allowing you to manage ACLs and configure the system after enabling ACLs.
+The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster. It generates a special **bootstrap token** with full administrative privileges, 
+allowing you to manage ACLs and configure the system after enabling ACLs.
 
 ---
 
@@ -745,7 +749,8 @@ This should confirm that the token has the `global-management` policy attached.
 
 ## **how to use consul roles, policies and tokens**
 
-Consul, a service discovery and configuration management tool, uses **roles**, **policies**, and **tokens** to enforce access control and security. Here's a step-by-step guide to using these concepts effectively:
+Consul, a service discovery and configuration management tool, uses **roles**, **policies**, and **tokens** to enforce access control and security. 
+Here's a step-by-step guide to using these concepts effectively:
 
 ---
 
@@ -836,4 +841,153 @@ Tokens are used to authenticate and associate actions with specific policies or 
 - **Audit Logs**: Use Consul audit logs to monitor token usage and detect anomalies.
 - **Namespace Support**: In multi-tenant environments, use namespaces for isolation.
 
-Let me know if you need help with specific configurations or troubleshooting!
+---
+### **Consul ACL Policies**
+## To view the complete list of subcommands.
+```
+Usage: consul acl policy <subcommand> [options] [args]
+
+  ...
+
+Subcommands:
+    create    Create an ACL policy
+    delete    Delete an ACL policy
+    list      Lists ACL policies
+    read      Read an ACL policy
+    update    Update an ACL policy
+```
+
+### **Basic Examples**
+**Create a new ACL policy**
+The acl policy create command creates new policies.
+
+The -rules parameter value allow loading the value from stdin, a file or the raw value. To use stdin pass - as the value. 
+To load the value from a file prefix the value with an @. Any other values will be used directly.
+```
+consul acl policy create -name "new-policy" \
+                         -description "This is an example policy" \
+                         -datacenter "dc1" \
+                         -datacenter "dc2" \
+                         -rules @rules.hcl
+```
+
+**List all policies**
+The acl policy list command lists all policies. By default it will not show metadata.
+```
+consul acl policy list
+```
+
+**Update a policy**
+The acl policy update command is used to update a policy. The default operations is to merge the current policy with those values provided to the command invocation. 
+Therefore to update just one field, only the -id or -name options and the option to modify must be provided. 
+Note that renaming policies requires both the -id and -name as the new name cannot yet be used to lookup the policy.
+```
+consul acl policy update -name "other-policy" -datacenter "dc1"
+consul acl policy update -id 35b8 -name "dc1-replication"
+consul acl policy update -id 35b8 -name "replication" -description "Policy capable of replication ACL policies and Intentions" -rules @rules.hcl
+```
+
+**Read a policy**
+The acl policy read command reads and displays a policies details.
+The table below shows this command's required ACLs. Configuration of blocking queries and agent caching are not supported from commands, 
+but may be from the corresponding HTTP endpoint.
+```
+consul acl policy read -id 0479e93e-091c-4475-9b06-79a004765c24
+```
+
+**Delete a policy**
+The acl policy delete command deletes a policy. Policies may be deleted by their ID or by name.
+```
+consul acl policy delete -name "my-policy"
+consul acl policy delete -id 35b8
+```
+---
+## **Consul ACL Roles**
+The acl role command is used to manage Consul's ACL roles. It exposes commands for creating, updating, reading, deleting, and listing roles. 
+This command is available in Consul 1.5.0 and newer.
+
+## Basic Examples
+
+**Create a new ACL role**
+The acl role create command creates new roles.
+```
+consul acl role create -name "new-role" \
+                       -description "This is an example role" \
+                       -policy-id 06acc965
+consul acl role create -name "crawler" -description "web crawler role" -policy-name "crawler-kv"
+consul acl role create -name archiver -description 'archiver role' -service-identity "archiver:dc2"
+```
+
+**List all roles**
+The acl role list command lists all roles. By default it will not show metadata.
+```
+consul acl role list
+```
+
+**Update a role**
+The acl role update command is used to update a role. The default operations is to merge the current role with those values provided to the command invocation. 
+Therefore to update just one field, only the -id or -name options and the option to modify must be provided. 
+Note that renaming roles requires both the -id and -name as the new name cannot yet be used to lookup the role.
+```
+consul acl role update -name "other-role" -datacenter "dc1"
+consul acl role update -id 57147d87-6bf7-f794-1a6e-7d038c4e4ae9 \
+    -description 'web crawler updated role' -service-identity 'crawler'
+consul acl role update -id 57147 -name web-crawler
+```
+
+**Read a role**
+The acl role read command reads and displays a roles details.
+```
+consul acl role read -id 0479e93e-091c-4475-9b06-79a004765c24
+consul acl role read -name archiver
+```
+
+**Delete a role**
+The acl role delete command deletes a role. Roles may be deleted by their ID or by name.
+```
+consul acl role delete -name "my-role"
+consul acl role delete -id 57147
+```
+
+## Consul ACL Tokens
+The acl token command is used to manage Consul's ACL tokens. It exposes commands for creating, updating, reading, deleting, and listing tokens. 
+This command is available in Consul 1.4.0 and newer.
+
+**Create a new ACL token:**
+This command creates new tokens. When creating a new token, policies may be linked using either the -policy-id or the -policy-name options. 
+When specifying policies by IDs you may use a unique prefix of the UUID as a shortcut for specifying the entire UUID.
+```
+consul acl token create \
+             -description "This is an example token" \
+             -policy-id 06acc965
+```
+
+**List all tokens**
+The acl token list command lists all tokens. By default it will not show metadata.
+```
+consul acl token list
+```
+
+**Clone a token**
+The acl token clone command clones an existing token.
+```
+consul acl token clone -id 59f8 -description "Clone of Super User"
+```
+
+**Update a token**
+The acl token update command will update a token. Some parts of the token like whether the token is local to the datacenter cannot be changed.
+```
+consul acl token update -id 986193 -description "WonderToken"
+```
+
+**Read a token with an accessor ID**
+The acl token read command reads and displays a token details.
+```
+consul acl token read -id 986193
+```
+
+**Delete a token**
+The acl token delete command deletes a token.
+```
+consul acl token delete -id 986193
+```
