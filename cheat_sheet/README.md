@@ -8,6 +8,8 @@
 | `terraform version`           | Displays the current version of Terraform installed.                                         |
 | `terraform force-unlock <lock-id>` | Release a stuck lock																	|
 | `terraform console`		| Try Terraform expressions at an interactive prompt							|
+| `terraform -install-autocomplete` | Setup tab
+auto-completion, requires logging back in |
 
 ---
 
@@ -16,14 +18,20 @@
 | Command                           | Description                                                                                   |
 |-----------------------------------|-----------------------------------------------------------------------------------------------|
 | `terraform init`                  | Initializes a Terraform configuration directory. Installs provider plugins and prepares the environment. |
+| `terraform init –plugin-dir=PATH` | force plugin installation from a dir  |
+| `terraform init –get-plugins=false` | skip plugin installation  |
+| `terraform init –backend=false` | skip backend configuration |
 | `terraform init -upgrade`         | Upgrade modules/providers to the latest allowed versions  |
+| `terraform init –migrate-state –force-copy` | update backend configuratio |
 | `terraform get`                   | Only download and install modules                         |
+| `terraform get -update=true`  | Download and update modules in the “root” module     |
 | `terraform validate`              | Validates the configuration files for syntax errors.                                         |
+| `terraform validate -backend=false` | Validate code skip backend validation.                                         |
 | `terraform fmt`                   | Formats the configuration files to the canonical style.                                       |
 | `terraform fmt -check `           | Check whether the configuration is formatted correctly, return non-zero exit code if not      |                                |
 | `terraform providers`             | Lists the providers required for the configuration.                                           |
 | `terraform graph`                 | Generates a dependency graph of Terraform resources.                                         |
-| `terraform graph | dot -Tpng > graph.png` | Generate a visual graph of Terraform resources |
+| `terraform graph \| dot -Tpng > graph.png` | Generate a visual graph of Terraform resources |
 
 ---
 
@@ -38,10 +46,17 @@
 | `terraform plan -var '<key>=<value>'`| Set a value for one of the input variables                                                 |
 | `terraform plan -refresh-only` | Inspect resource drift without updating the state file                                           |
 | `terraform apply`                 | Applies the changes required to reach the desired state defined in the configuration files.  |
+| `terraform apply -lock=true` | Lock the state file so it can’t be modified by any other Terraform apply or modification action (possible only where backend allows  locking)  |
+| `terraform apply var my_region_variable=us-east-1` | Pass a variable via command-line while applying a configuration |
 | `terraform apply <file>`  | Create or update infrastructure using a plan file                                                     |
 | `terraform apply -target <resource>`| Create or update a specific resource                                                        |
 | `terraform apply -replace <resource>`| Force the replacement of a specific resource                                               |
 | `terraform apply -auto-approve`   | Applies the changes without prompting for confirmation.                                       |
+| `terraform apply --parallelism=5 ` | Number of
+simultaneous resource operations |                                       |
+| `terraform apply refresh=false `   | Do not reconcile state
+file with real-world resources(helpful with large
+complex deployments for saving deployment time) |                                      |
 | `terraform destroy`               | Removes all infrastructure managed by the configuration.                                     |
 | `terraform destroy -target <resource>`| Destroy a specific resource                                                               |
 | `terraform destroy -auto-approve` | Destroys resources without confirmation prompt.                                               |
@@ -60,6 +75,7 @@
 | `terraform state rm <resource>`   | Removes a resource from the state file without destroying it.                                |
 | `terraform state mv <source> <dest> ` | Moves a resource in the state file.                                                          |
 | `terraform state pull `           | Pull current state and output to stdout                                                      |
+| `terraform state push `           | push current state and output to stdout                                                      |
 | `terraform state replace-provider <from> <to>` | Replace provider for resources in the state                                     |
 
 ---
