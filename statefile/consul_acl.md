@@ -1,6 +1,6 @@
 # 1. How to create a Consul token for a Terraform backend that will not expire?
 
-To create a Consul token for Terraform's backend that does not expire, you need to generate a token with an appropriate policy and set the TTL (Time-to-Live) to `0`, 
+To create a Consul token for Terraform's backend that does not expire, you need to generate a token with an appropriate policy and set the TTL (Time-to-Live) to `0`,
 which indicates no expiration.
 
 Here’s how you can do it:
@@ -8,6 +8,7 @@ Here’s how you can do it:
 ---
 
 ### **1. Create a Policy for Terraform Backend**
+
 You need a policy that grants the necessary permissions for Terraform's Consul backend. For example:
 
 ```hcl
@@ -22,6 +23,7 @@ This policy gives write access to all keys under the `terraform/` namespace.
 ---
 
 ### **2. Apply the Policy in Consul**
+
 Use the `consul acl policy create` command to add this policy to your Consul cluster:
 
 ```bash
@@ -33,6 +35,7 @@ consul acl policy create \
 ---
 
 ### **3. Create a Token with No Expiration**
+
 Now, generate a token associated with the policy you just created. Set its TTL to `0` to make it non-expiring:
 
 ```bash
@@ -47,6 +50,7 @@ The output will contain a token that you can use in your Terraform configuration
 ---
 
 ### **4. Update Terraform Backend Configuration**
+
 In your `terraform` backend block, update the configuration to use the generated token:
 
 ```hcl
@@ -62,6 +66,7 @@ terraform {
 ---
 
 ### **5. Secure the Token**
+
 Ensure the token is securely stored, as it grants access to the backend state. You can use environment variables or a secure secrets management system.
 
 For example, using an environment variable:
@@ -84,14 +89,14 @@ terraform {
 ---
 
 ### **6. Verify the Token**
+
 To confirm that the token works, test with the following command:
 
 ```bash
 consul acl token read -id "your-generated-token-id"
 ```
 
-This ensures that the token is valid and has the expected permissions.
----
+## This ensures that the token is valid and has the expected permissions.
 
 # 2. How to configure tokens to access and manage the Consul Web UI?
 
@@ -100,6 +105,7 @@ Here's a step-by-step guide:
 ---
 
 ### **1. Enable ACLs in Consul**
+
 If ACLs are not already enabled, you can enable them by updating your Consul configuration file (e.g., `config.hcl`):
 
 ```hcl
@@ -126,6 +132,7 @@ systemctl restart consul
 ---
 
 ### **2. Create a Policy for Web UI Access**
+
 Define a policy that allows read access to resources required by the Web UI. Save this to a file like `web-ui-policy.hcl`:
 
 ```hcl
@@ -156,6 +163,7 @@ This grants read access to nodes, services, keys, and agents.
 ---
 
 ### **3. Apply the Policy**
+
 Create the policy in Consul:
 
 ```bash
@@ -165,6 +173,7 @@ consul acl policy create -name "web-ui-policy" -rules @web-ui-policy.hcl
 ---
 
 ### **4. Generate a Token for the Web UI**
+
 Create a token associated with the `web-ui-policy`:
 
 ```bash
@@ -176,6 +185,7 @@ Copy the generated token from the output.
 ---
 
 ### **5. Configure the Web UI with the Token**
+
 Use the generated token to authenticate in the Web UI:
 
 1. Open the Consul Web UI in your browser.
@@ -185,6 +195,7 @@ Use the generated token to authenticate in the Web UI:
 ---
 
 ### **6. Set Up an Environment Variable (Optional)**
+
 If you frequently use the Consul CLI and Web UI, you can export the token as an environment variable:
 
 ```bash
@@ -194,18 +205,20 @@ export CONSUL_HTTP_TOKEN="your-web-ui-token"
 ---
 
 ### **7. (Optional) Restrict the Token Further**
+
 You can restrict the `web-ui-policy` to specific namespaces, datacenters, or paths to limit access further.
 
 ---
 
 # 3. What is the Consul ACL bootstrap command used for?
 
-The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster. 
+The `consul acl bootstrap` command is used to initialize the ACL system in a Consul cluster.
 It generates a special **bootstrap token** with full administrative privileges, allowing you to manage ACLs and configure the system after enabling ACLs.
 
 ---
 
 ### **Why is ACL Bootstrap Needed?**
+
 When ACLs are first enabled in Consul, there is no existing token or policy in the system. The `acl bootstrap` command creates an initial token that you can use to:
 
 1. Define policies.
@@ -217,6 +230,7 @@ When ACLs are first enabled in Consul, there is no existing token or policy in t
 ### **How to Use `consul acl bootstrap`**
 
 #### **1. Ensure ACLs Are Enabled**
+
 Before running the bootstrap command, ensure ACLs are enabled in the Consul configuration. Add the following to your Consul configuration file (e.g., `config.hcl`):
 
 ```hcl
@@ -236,6 +250,7 @@ systemctl restart consul
 ---
 
 #### **2. Run the Bootstrap Command**
+
 Run the following command on a Consul server node:
 
 ```bash
@@ -257,11 +272,13 @@ consul acl bootstrap
 ---
 
 #### **3. Save the Bootstrap Token**
+
 The bootstrap token grants **full administrative privileges**. Securely store this token as it is critical for managing the Consul cluster.
 
 ---
 
 #### **4. Verify the Bootstrap Token**
+
 To verify that the token works, run:
 
 ```bash
@@ -297,6 +314,7 @@ This should confirm that the token has the `global-management` policy attached.
 ---
 
 # 4. How to create a Consul token for Terraform's backend that does not expire?
+
 To create a Consul token for Terraform's backend that does not expire, you need to generate a token with an appropriate policy and set the TTL (Time-to-Live) to `0`, which indicates no expiration.
 
 Here’s how you can do it:
@@ -304,6 +322,7 @@ Here’s how you can do it:
 ---
 
 ### **1. Create a Policy for Terraform Backend**
+
 You need a policy that grants the necessary permissions for Terraform's Consul backend. For example:
 
 ```hcl
@@ -318,6 +337,7 @@ This policy gives write access to all keys under the `terraform/` namespace.
 ---
 
 ### **2. Apply the Policy in Consul**
+
 Use the `consul acl policy create` command to add this policy to your Consul cluster:
 
 ```bash
@@ -329,6 +349,7 @@ consul acl policy create \
 ---
 
 ### **3. Create a Token with No Expiration**
+
 Now, generate a token associated with the policy you just created. Set its TTL to `0` to make it non-expiring:
 
 ```bash
@@ -343,6 +364,7 @@ The output will contain a token that you can use in your Terraform configuration
 ---
 
 ### **4. Update Terraform Backend Configuration**
+
 In your `terraform` backend block, update the configuration to use the generated token:
 
 ```hcl
@@ -358,6 +380,7 @@ terraform {
 ---
 
 ### **5. Secure the Token**
+
 Ensure the token is securely stored, as it grants access to the backend state. You can use environment variables or a secure secrets management system.
 
 For example, using an environment variable:
@@ -380,20 +403,21 @@ terraform {
 ---
 
 ### **6. Verify the Token**
+
 To confirm that the token works, test with the following command:
 
 ```bash
 consul acl token read -id "your-generated-token-id"
 ```
 
-This ensures that the token is valid and has the expected permissions.
----
+## This ensures that the token is valid and has the expected permissions.
 
 # 5. How to Create a **super admin** in Consul?
 
 ---
 
 ### **1. Enable ACLs in Consul**
+
 Ensure ACLs are enabled in your Consul configuration. Edit the configuration file (e.g., `config.hcl`):
 
 ```hcl
@@ -416,6 +440,7 @@ systemctl restart consul
 ---
 
 ### **2. Define the Super Admin Policy**
+
 Create a policy file with full access permissions, e.g., `super-admin-policy.hcl`:
 
 ```hcl
@@ -452,6 +477,7 @@ This policy grants write access to all resources in Consul.
 ---
 
 ### **3. Create the Policy in Consul**
+
 Use the `consul` CLI to create the super admin policy:
 
 ```bash
@@ -461,6 +487,7 @@ consul acl policy create -name "super-admin" -rules @super-admin-policy.hcl
 ---
 
 ### **4. Generate a Super Admin Token**
+
 Create a token associated with the `super-admin` policy:
 
 ```bash
@@ -472,6 +499,7 @@ The output will include the token, which you should securely store.
 ---
 
 ### **5. Use the Super Admin Token**
+
 - To use the token with the Consul CLI:
 
   ```bash
@@ -483,6 +511,7 @@ The output will include the token, which you should securely store.
 ---
 
 ### **6. Verify the Super Admin Token**
+
 Test the token to ensure it has the necessary permissions:
 
 ```bash
@@ -494,10 +523,12 @@ It should show that the token is associated with the `super-admin` policy.
 ---
 
 ### **7. Secure the Token**
+
 - **Store Securely:** Save the token in a secure secrets manager.
 - **Restrict Access:** Limit who can access the token to avoid accidental misuse.
 
 ---
+
 # 6. Where is the location of the config.hcl file?
 
 The location of the `config.hcl` file for Consul depends on your system setup and how Consul was installed. Here are the common locations and configurations:
@@ -505,12 +536,15 @@ The location of the `config.hcl` file for Consul depends on your system setup an
 ---
 
 ### **Default Locations**
+
 1. **Linux (Systemd-Based Installations):**
-   - `/etc/consul.d/`  
+
+   - `/etc/consul.d/`
      - This is the most common directory for Consul configuration files. Look for `config.hcl` or create one in this directory.
    - Example: `/etc/consul.d/config.hcl`
 
 2. **Windows:**
+
    - `C:\Program Files\Consul\config\`
    - Example: `C:\Program Files\Consul\config\config.hcl`
 
@@ -521,12 +555,15 @@ The location of the `config.hcl` file for Consul depends on your system setup an
 ---
 
 ### **Custom Configuration Paths**
+
 If Consul was started with a custom configuration directory, the path may differ. You can check the custom path by inspecting how Consul was started:
 
 - If Consul is run via a service (e.g., systemd), check the service file:
+
   ```bash
   systemctl cat consul
   ```
+
   Look for the `-config-dir` or `-config-file` flags, which specify the configuration directory or file.
 
 - If Consul is run manually, review the command used to start it:
@@ -537,12 +574,14 @@ If Consul was started with a custom configuration directory, the path may differ
 ---
 
 ### **Combining Multiple Config Files**
-If you have multiple `.hcl` or `.json` configuration files in the configuration directory, Consul automatically merges them. 
+
+If you have multiple `.hcl` or `.json` configuration files in the configuration directory, Consul automatically merges them.
 You can place `config.hcl` alongside other configuration files in the directory.
 
 ---
 
 ### **Verify the Active Configuration**
+
 To confirm where Consul is loading its configuration from, use the following command:
 
 ```bash
@@ -559,16 +598,19 @@ consul info | grep ConfigDir
 
 # 7. how to use consul roles, policies and tokens?
 
-Consul, a service discovery and configuration management tool, uses **roles**, **policies**, and **tokens** to enforce access control and security. 
+Consul, a service discovery and configuration management tool, uses **roles**, **policies**, and **tokens** to enforce access control and security.
 Here's a step-by-step guide to using these concepts effectively:
 
 ---
 
 ## 1. **Policies**
+
 Policies define the permissions for accessing resources within Consul.
 
 ### Create a Policy
+
 1. Write a policy file (e.g., `read-policy.hcl`):
+
    ```hcl
    # Grants read access to all keys in the KV store
    key_prefix "" {
@@ -577,6 +619,7 @@ Policies define the permissions for accessing resources within Consul.
    ```
 
 2. Add the policy using the CLI:
+
    ```bash
    consul acl policy create -name "read-policy" -description "Read access to all KV keys" -rules @read-policy.hcl
    ```
@@ -589,10 +632,13 @@ Policies define the permissions for accessing resources within Consul.
 ---
 
 ## 2. **Roles**
+
 Roles are collections of policies, making it easier to manage permissions for groups of users or applications.
 
 ### Create a Role
+
 1. Create a role that references policies:
+
    ```bash
    consul acl role create -name "read-role" -description "Role for read access" -policy-name "read-policy"
    ```
@@ -605,15 +651,19 @@ Roles are collections of policies, making it easier to manage permissions for gr
 ---
 
 ## 3. **Tokens**
+
 Tokens are used to authenticate and associate actions with specific policies or roles.
 
 ### Create a Token
+
 1. Generate a token associated with a role:
+
    ```bash
    consul acl token create -description "Token for read access" -role-name "read-role"
    ```
 
 2. Example output:
+
    ```plaintext
    AccessorID:   5b5e6d21-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    SecretID:     54c2d6e6-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -626,6 +676,7 @@ Tokens are used to authenticate and associate actions with specific policies or 
 ---
 
 ### Manage Tokens
+
 - **Read Token Details**:
   ```bash
   consul acl token read -id <AccessorID>
@@ -638,6 +689,7 @@ Tokens are used to authenticate and associate actions with specific policies or 
 ---
 
 ## Example Workflow
+
 1. Define policies for different access levels (e.g., `read-policy`, `write-policy`).
 2. Create roles that aggregate these policies (e.g., `read-role`, `admin-role`).
 3. Generate tokens linked to these roles and distribute them to users or services.
@@ -646,15 +698,18 @@ Tokens are used to authenticate and associate actions with specific policies or 
 ---
 
 ## Best Practices
+
 - **Principle of Least Privilege**: Assign the minimum permissions required for a task.
 - **Token Rotation**: Regularly rotate tokens to enhance security.
 - **Audit Logs**: Use Consul audit logs to monitor token usage and detect anomalies.
 - **Namespace Support**: In multi-tenant environments, use namespaces for isolation.
 
 ---
-# 8. Consule Basic commands 
+
+# 8. Consule Basic commands
 
 ## 1. **Consul ACL Policies**
+
 ### To view the complete list of subcommands.
 
 ```bash
@@ -671,10 +726,11 @@ Subcommands:
 ```
 
 ### **Basic Examples**
+
 **Create a new ACL policy**
 
 The acl policy create command creates new policies.
-The -rules parameter value allow loading the value from stdin, a file or the raw value. To use stdin pass - as the value. 
+The -rules parameter value allow loading the value from stdin, a file or the raw value. To use stdin pass - as the value.
 To load the value from a file prefix the value with an @. Any other values will be used directly.
 
 ```bash
@@ -695,9 +751,10 @@ consul acl policy list
 
 **Update a policy**
 
-The acl policy update command is used to update a policy. The default operations is to merge the current policy with those values provided to the command invocation. 
-Therefore to update just one field, only the -id or -name options and the option to modify must be provided. 
+The acl policy update command is used to update a policy. The default operations is to merge the current policy with those values provided to the command invocation.
+Therefore to update just one field, only the -id or -name options and the option to modify must be provided.
 Note that renaming policies requires both the -id and -name as the new name cannot yet be used to lookup the policy.
+
 ```bash
 consul acl policy update -name "other-policy" -datacenter "dc1"
 consul acl policy update -id 35b8 -name "dc1-replication"
@@ -707,7 +764,7 @@ consul acl policy update -id 35b8 -name "replication" -description "Policy capab
 **Read a policy**
 
 The acl policy read command reads and displays a policies details.
-The table below shows this command's required ACLs. Configuration of blocking queries and agent caching are not supported from commands, 
+The table below shows this command's required ACLs. Configuration of blocking queries and agent caching are not supported from commands,
 but may be from the corresponding HTTP endpoint.
 
 ```bash
@@ -722,11 +779,12 @@ The acl policy delete command deletes a policy. Policies may be deleted by their
 consul acl policy delete -name "my-policy"
 consul acl policy delete -id 35b8
 ```
+
 ---
 
 ## 2. **Consul ACL Roles**
 
-The acl role command is used to manage Consul's ACL roles. It exposes commands for creating, updating, reading, deleting, and listing roles. 
+The acl role command is used to manage Consul's ACL roles. It exposes commands for creating, updating, reading, deleting, and listing roles.
 This command is available in Consul 1.5.0 and newer.
 
 ## Basic Examples
@@ -753,8 +811,8 @@ consul acl role list
 
 **Update a role**
 
-The acl role update command is used to update a role. The default operations is to merge the current role with those values provided to the command invocation. 
-Therefore to update just one field, only the -id or -name options and the option to modify must be provided. 
+The acl role update command is used to update a role. The default operations is to merge the current role with those values provided to the command invocation.
+Therefore to update just one field, only the -id or -name options and the option to modify must be provided.
 Note that renaming roles requires both the -id and -name as the new name cannot yet be used to lookup the role.
 
 ```bash
@@ -784,12 +842,12 @@ consul acl role delete -id 57147
 
 ## 3. **Consul ACL Tokens**
 
-The acl token command is used to manage Consul's ACL tokens. It exposes commands for creating, updating, reading, deleting, and listing tokens. 
+The acl token command is used to manage Consul's ACL tokens. It exposes commands for creating, updating, reading, deleting, and listing tokens.
 This command is available in Consul 1.4.0 and newer.
 
 **Create a new ACL token:**
 
-This command creates new tokens. When creating a new token, policies may be linked using either the -policy-id or the -policy-name options. 
+This command creates new tokens. When creating a new token, policies may be linked using either the -policy-id or the -policy-name options.
 When specifying policies by IDs you may use a unique prefix of the UUID as a shortcut for specifying the entire UUID.
 
 ```bash

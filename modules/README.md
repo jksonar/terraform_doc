@@ -1,36 +1,42 @@
 # 1. What is terraform module and how to use it?
 
 In **Terraform**, a **module** is a container for multiple resources that are used together.
-A module is a way to organize and reuse your Terraform code by grouping related infrastructure components into a single, 
+A module is a way to organize and reuse your Terraform code by grouping related infrastructure components into a single,
 reusable unit. This helps in managing complexity, maintaining consistency, and improving the scalability of your infrastructure code.
 
 ---
 
 ## 1. **Key Points about Modules**
-1. **Every Terraform configuration is a Module**  
-   - The root module is the directory where you run Terraform commands.  
+
+1. **Every Terraform configuration is a Module**
+
+   - The root module is the directory where you run Terraform commands.
    - Additional modules can be nested inside the root module.
 
-2. **Reusable**  
+2. **Reusable**
+
    - Modules can be used to define reusable and standard patterns for creating infrastructure.
 
-3. **Composability**  
+3. **Composability**
+
    - You can combine multiple smaller modules to form a larger infrastructure configuration.
 
-4. **Encapsulation**  
+4. **Encapsulation**
    - A module hides the complexity of resource definitions, exposing only the necessary variables and outputs.
 
 ---
 
 ## 2. **Components of a Module**
+
 A module typically consists of:
-1. **`main.tf`**  
+
+1. **`main.tf`**
    - Defines the resources and logic for the module.
-2. **`variables.tf`**  
+2. **`variables.tf`**
    - Defines the input variables required by the module.
-3. **`outputs.tf`**  
+3. **`outputs.tf`**
    - Specifies the output values that are returned by the module.
-4. **Optional Files**  
+4. **Optional Files**
    - `README.md`: Documentation for the module.
    - `providers.tf`: Specifies providers for the module.
    - Other `.tf` files for organizing additional configurations.
@@ -38,9 +44,9 @@ A module typically consists of:
 ---
 
 ## 3. **Why Use Modules?**
+
 - **Simplify Complex Infrastructure**  
   Breaking large configurations into smaller, reusable modules makes it easier to manage and understand.
-  
 - **Encourage Code Reuse**  
   Modules can be used across different environments or projects, reducing redundancy.
 
@@ -55,7 +61,9 @@ A module typically consists of:
 # 2. **How to Create and Use Modules**
 
 #### **1. Create a Module**
+
 - Create a directory for the module:
+
   ```bash
   my-module/
   ├── main.tf
@@ -65,6 +73,7 @@ A module typically consists of:
 
 - **Example**: Module to create an AWS EC2 instance.
   **`main.tf`**
+
   ```hcl
   resource "aws_instance" "example" {
     ami           = var.ami
@@ -76,6 +85,7 @@ A module typically consists of:
   ```
 
   **`variables.tf`**
+
   ```hcl
   variable "ami" {
     description = "The AMI to use for the instance"
@@ -95,6 +105,7 @@ A module typically consists of:
   ```
 
   **`outputs.tf`**
+
   ```hcl
   output "instance_id" {
     value = aws_instance.example.id
@@ -108,7 +119,9 @@ A module typically consists of:
 ---
 
 #### **2. Use a Module**
+
 To use the module, reference it in another Terraform configuration:
+
 ```hcl
 module "ec2_instance" {
   source         = "./my-module" # Path to the module directory
@@ -128,28 +141,34 @@ module "ec2_instance" {
 ---
 
 ### **Sources for Modules**
+
 Modules can be sourced from different locations:
-1. **Local Path**  
+
+1. **Local Path**
+
    ```hcl
    source = "./path/to/module"
    ```
 
-2. **Terraform Registry**  
+2. **Terraform Registry**
+
    ```hcl
    source = "terraform-aws-modules/vpc/aws"
    ```
 
-3. **Git Repository**  
+3. **Git Repository**
+
    ```hcl
    source = "git::https://github.com/example/repo.git"
    ```
 
-4. **HTTP URL**  
+4. **HTTP URL**
+
    ```hcl
    source = "https://example.com/modules/vpc.zip"
    ```
 
-5. **S3 Bucket**  
+5. **S3 Bucket**
    ```hcl
    source = "s3::https://my-bucket.s3.amazonaws.com/modules/module.zip"
    ```
@@ -157,6 +176,7 @@ Modules can be sourced from different locations:
 ---
 
 # 3. **Best Practices for Modules**
+
 1. **Use Variables Judiciously**  
    Define variables for inputs to make the module flexible.
 
@@ -175,8 +195,10 @@ Modules can be sourced from different locations:
 ---
 
 ### **Example Terraform Registry Module**
+
 The Terraform Registry (https://registry.terraform.io/) hosts public modules.  
 Example: AWS VPC Module:
+
 ```hcl
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -187,19 +209,23 @@ module "vpc" {
   azs  = ["us-east-1a", "us-east-1b"]
 }
 ```
+
 # 4. how to use module to setup different environments like dev, uat and prod?
 
-Setting up **different environments** (like `dev`, `uat`, and `prod`) using Terraform modules is a best practice. 
-It allows you to reuse the same module for multiple environments while customizing configurations for each. 
+Setting up **different environments** (like `dev`, `uat`, and `prod`) using Terraform modules is a best practice.
+It allows you to reuse the same module for multiple environments while customizing configurations for each.
 Here's a step-by-step guide:
 
 ---
 
 ### **1. Create the Module**
+
 The module should define reusable resources that can be parameterized for different environments.
 
 #### Example: A Module for an AWS VPC
+
 **Module Structure:**
+
 ```plaintext
 terraform-modules/
 ├── vpc/
@@ -210,6 +236,7 @@ terraform-modules/
 ```
 
 **`main.tf`:**
+
 ```hcl
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr_block
@@ -233,6 +260,7 @@ resource "aws_subnet" "subnet" {
 ```
 
 **`variables.tf`:**
+
 ```hcl
 variable "cidr_block" {
   description = "The CIDR block for the VPC"
@@ -262,6 +290,7 @@ variable "environment" {
 ```
 
 **`outputs.tf`:**
+
 ```hcl
 output "vpc_id" {
   value = aws_vpc.main.id
@@ -275,9 +304,11 @@ output "subnet_ids" {
 ---
 
 ### **2. Define Environment Configurations**
+
 Create a directory for each environment (`dev`, `uat`, `prod`) and provide specific variables for each.
 
 #### Example Directory Structure:
+
 ```plaintext
 environments/
 ├── dev/
@@ -292,7 +323,9 @@ environments/
 ```
 
 #### **Environment-Specific Configurations**
+
 **`main.tf`:** (Common for all environments)
+
 ```hcl
 module "vpc" {
   source              = "../../terraform-modules/vpc"
@@ -305,7 +338,9 @@ module "vpc" {
 ```
 
 **`terraform.tfvars`:** (Environment-Specific)
+
 - **dev/terraform.tfvars**
+
   ```hcl
   cidr_block          = "10.0.0.0/16"
   subnet_count        = 2
@@ -315,6 +350,7 @@ module "vpc" {
   ```
 
 - **uat/terraform.tfvars**
+
   ```hcl
   cidr_block          = "10.1.0.0/16"
   subnet_count        = 3
@@ -337,32 +373,39 @@ module "vpc" {
 ### **3. Deploy Environment-Specific Infrastructure**
 
 #### Navigate to the Environment Directory
+
 For example, for the `dev` environment:
+
 ```bash
 cd environments/dev
 ```
 
 #### Initialize Terraform
+
 ```bash
 terraform init
 ```
 
 #### Preview Changes
+
 ```bash
 terraform plan
 ```
 
 #### Apply Changes
+
 ```bash
 terraform apply
 ```
 
 #### Repeat for Other Environments
+
 Navigate to `uat` or `prod` directories and repeat the steps.
 
 ---
 
 ### **4. Best Practices for Managing Environments**
+
 1. **Use a Backend for State Files**  
    Store state files in a remote backend (e.g., AWS S3 with state locking via DynamoDB) to avoid conflicts and ensure team collaboration.
 

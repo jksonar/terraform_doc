@@ -7,6 +7,7 @@ Each workspace has its **own state file**, which means resources in different wo
 ---
 
 ### **Key Features of Workspaces**
+
 1. **Isolated State Files**  
    Each workspace maintains its own `.tfstate` file, avoiding conflicts between environments.
 
@@ -19,6 +20,7 @@ Each workspace has its **own state file**, which means resources in different wo
 ---
 
 ### **When to Use Workspaces**
+
 - Managing **multiple environments** (e.g., `dev`, `test`, `prod`) within the same configuration.
 - Handling **multi-tenancy**, where different teams or clients need isolated instances of the same infrastructure.
 
@@ -28,20 +30,22 @@ Each workspace has its **own state file**, which means resources in different wo
 
 ### **Common Workspace Commands**
 
-| Command                                | Description                                                                                   |
-|----------------------------------------|-----------------------------------------------------------------------------------------------|
-| `terraform workspace list`             | Lists all available workspaces in the current configuration.                                  |
-| `terraform workspace show`             | Displays the name of the current workspace.                                                  |
-| `terraform workspace new <name>`       | Creates a new workspace with the specified name.                                             |
-| `terraform workspace select <name>`    | Switches to an existing workspace.                                                           |
-| `terraform workspace delete <name>`    | Deletes an existing workspace (state files are lost).                                        |
+| Command                             | Description                                                  |
+| ----------------------------------- | ------------------------------------------------------------ |
+| `terraform workspace list`          | Lists all available workspaces in the current configuration. |
+| `terraform workspace show`          | Displays the name of the current workspace.                  |
+| `terraform workspace new <name>`    | Creates a new workspace with the specified name.             |
+| `terraform workspace select <name>` | Switches to an existing workspace.                           |
+| `terraform workspace delete <name>` | Deletes an existing workspace (state files are lost).        |
 
 ---
 
 ### **How to Use Workspaces**
 
 #### **1. Initialize the Configuration**
+
 Run the following command to initialize your Terraform configuration:
+
 ```bash
 terraform init
 ```
@@ -49,22 +53,29 @@ terraform init
 ---
 
 #### **2. List Existing Workspaces**
+
 To check available workspaces:
+
 ```bash
 terraform workspace list
 ```
+
 Output:
+
 ```
 * default
   dev
   prod
 ```
+
 The `*` indicates the current workspace.
 
 ---
 
 #### **3. Create a New Workspace**
+
 Create a workspace named `dev`:
+
 ```bash
 terraform workspace new dev
 ```
@@ -72,7 +83,9 @@ terraform workspace new dev
 ---
 
 #### **4. Switch to a Workspace**
+
 Switch to the `prod` workspace:
+
 ```bash
 terraform workspace select prod
 ```
@@ -80,9 +93,11 @@ terraform workspace select prod
 ---
 
 #### **5. Use Workspaces in Configuration**
+
 To differentiate resources between workspaces, use the **`terraform.workspace`** variable. For example:
 
 **`main.tf`:**
+
 ```hcl
 resource "aws_s3_bucket" "example" {
   bucket = "my-bucket-${terraform.workspace}"
@@ -99,17 +114,22 @@ If you run this configuration in the `dev` workspace, the bucket name will be `m
 ---
 
 #### **6. Apply Configuration in a Workspace**
+
 Run `terraform plan` and `terraform apply` for a specific workspace:
+
 ```bash
 terraform plan
 terraform apply
 ```
+
 The changes will be applied to the state file associated with the active workspace.
 
 ---
 
 #### **7. Delete a Workspace**
+
 To delete a workspace (except `default`):
+
 ```bash
 terraform workspace delete dev
 ```
@@ -117,12 +137,14 @@ terraform workspace delete dev
 ---
 
 ### **Best Practices with Workspaces**
+
 1. **Use Remote State for Collaboration**  
    Store state files in a backend like S3 or Terraform Cloud to ensure team collaboration.
 
 2. **Parameterize with Variables**  
    Combine workspaces with variables to manage environment-specific settings:
    **`variables.tf`**:
+
    ```hcl
    variable "region" {
      default = {
@@ -137,6 +159,7 @@ terraform workspace delete dev
    ```
 
    Use it in resources:
+
    ```hcl
    provider "aws" {
      region = var.region[var.environment]
@@ -144,6 +167,7 @@ terraform workspace delete dev
    ```
 
 3. **Limit Workspace Usage**  
-   Use workspaces for simple cases. For complex setups (e.g., separate teams managing environments), 
+   Use workspaces for simple cases. For complex setups (e.g., separate teams managing environments),
    consider different directories or repositories.
+
 ---
